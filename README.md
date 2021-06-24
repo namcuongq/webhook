@@ -46,6 +46,7 @@ Trên server truy cập link sau để xem các request
 ```
 http://[ip]/admin/hook/view
 ```
+![demo](https://github.com/namcuongq/webhook/blob/main/example/request.png)
 ### XSS RCE
 Mục đích: RCE trên trình duyệt của victim để đỡ phải gửi đi gửi lại nhiều request. Kết nối 1 lần dùng mãi mãi.
 Chỉnh sửa địa chỉ server trong file [xss_rce.js](https://github.com/namcuongq/webhook/blob/main/static/js/xss_rce.js). Tạo payload xss load script từ link `http://<ip>/static/js/xss_rce.js`
@@ -53,3 +54,4 @@ Trên server truy cập link sau để bắt đầu:
 ```
 http://<ip>/admin/xss/channels
 ```
+![demo](https://github.com/namcuongq/webhook/blob/main/example/xss.png)
