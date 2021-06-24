@@ -1,0 +1,80 @@
+<html ng-app="app" ng-controller="AppController" class="ng-scope">
+    {{template "header"}}
+    <body style="padding-top: 50px;">
+        <!-- uiView: -->
+        <div class="mainView ng-scope" ui-view="">
+            {{template "menu"}}
+            <!-- ngIf: token.uuid -->
+            <div class="container-fluid ng-scope" id="app" ng-if="token.uuid">
+                <div class="row">
+                    <div class="col-sm-3 col-md-2 sidebar sidebar-top" style="top: 50px;">
+                        <div class="sidebar-header">
+                            <button type="button" id="sorting-toggle" class="btn btn-default btn-xxs dropdown-toggle ng-binding" ng-click="toggleSorting()" title="Toggle ordering">Victims</button>
+                        </div>
+
+                        <div>
+                            <ul class="nav nav-sidebar">
+                                <!-- ngRepeat: (key, request) in requests.data -->
+                                {{range .Victims}}
+                                <li
+                                    id="{{.Id}}"
+                                    ng-repeat="(key, request) in requests.data"
+                                    ng-class="{
+                                'active': currentRequestIndex === request.uuid,
+                                'unread': unread.indexOf(request.uuid) !== -1,
+                                'muted': request.dont_save === true
+                            }"
+                                    class="ng-scope"
+                                >
+                                    <a onclick="getDetail('{{.Id}}')" ng-click="setCurrentRequest(request)" class="select ng-binding">
+                                        <!-- ngIf: request.type === 'web' -->
+                                        <span ng-if="request.type === 'web'" class='label label-primary'>XSS</span>
+                                        <!-- end ngIf: request.type === 'web' -->
+                                        <!-- ngIf: request.type === 'email' -->
+                                        {{.Ip}}<br>
+                                        <small class="ng-binding">{{.Date}}</small>
+                                    </a>
+                                    <a href="/admin/xss/channel/{{.Id}}/delete" class="btn btn-danger delete hidden-sm" title="Delete request">
+                                        <i class="">X</i>
+                                    </a>
+                                </li>
+                                <!-- end ngRepeat: (key, request) in requests.data -->
+                                {{end}}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-md-2 sidebar" style="margin-top: 10px; height: 40px; bottom: 0px; top: auto; padding: 10px 0 0 0;">
+                        <div class="text-center" ng-show="hasRequests">
+                        
+                        </div>
+                    </div>
+                    <div id="request" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                        <div>
+                            <div class="container-fluid">
+                                <div class="row" id="requestDetails" ng-show="!hideDetails" ng-class="{'muted': !hasRequests}">
+                                    <iframe id="iframe_detail" src="" style="width:100%;height: 100%;"></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end ngIf: token.uuid -->
+
+        </div>
+        
+        <script>
+            var current_id = "";
+
+            function getDetail(id){
+                if (current_id != "" ){
+                    document.getElementById(current_id).classList.remove("active");
+                }
+                current_id = id;
+                console.log(id)
+                document.getElementById(current_id).classList.add("active");
+                document.getElementById('iframe_detail').src = "/admin/xss/channel/"+id;
+            }
+        </script>
+    </body>
+</html>

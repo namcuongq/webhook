@@ -1,0 +1,71 @@
+<html ng-app="app" ng-controller="AppController" class="ng-scope">
+    {{template "header"}}
+    <body>
+        <!-- uiView: -->
+        <div class="mainView ng-scope" ui-view="">
+            <!-- ngIf: token.uuid -->
+            <div class="container-fluid ng-scope" id="app" ng-if="token.uuid">
+                <div class="row">
+                    <div id="request" class="col-12">
+
+                        <div>
+                            <div class="container-fluid">
+                                <div class="row" id="requestDetails" ng-show="!hideDetails" ng-class="{'muted': !hasRequests}">
+                                    <div class="col-md-12">
+                                        <table class="table table-borderless table-striped">
+                                            <thead>
+                                                <tr>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <center style="text-align: left;">
+                                                    <h3 id="name"style="text-align: center;" >Channel: {{.Channel.Id}}</h3>
+                                                    <form onSubmit="return false;" autocomplete="on">
+                                                        <input style="width: 100%;margin-bottom: 20px;" placeholder="cmd" id="text" type="text">
+                                                    </form>
+                                                    <pre id="chat"></pre>
+                                                  </center>
+                                              
+                                                  <script>
+                                                    var url = "wss://" + window.location.host + window.location.pathname + "/ws";
+                                                    var ws = new WebSocket(url);
+                                                    var name = "{{.Channel.Ip}}";
+                                              
+                                                    var chat = document.getElementById("chat");
+                                                    var text = document.getElementById("text");
+                                                    var now = function () {
+                                                      var iso = new Date().toISOString();
+                                                      return iso.split("T")[1].split(".")[0];
+                                                    };
+
+                                                    chat.innerHTML = "<span style='color: red;font-weight: bold;'>"+name + "-[" + now() + "]# "+"</span>" + "\n";;
+
+                                                    function encode(e){return e.replace(/[^]/g,function(e){return"&#"+e.charCodeAt(0)+";"})}
+                                              
+                                                    ws.onmessage = function (msg) {
+                                                      var line = encode(decodeURIComponent(escape(window.atob(msg.data)))) + "\n";
+                                                      chat.innerHTML += line;
+                                                    };
+                                              
+                                                    text.onkeydown = function (e) {
+                                                      if (e.keyCode === 13 && text.value !== "") {
+                                                        ws.send(btoa(unescape(encodeURIComponent(text.value))));
+                                                        var line =  "<span style='color: red;font-weight: bold;'>"+name + "-[" + now() + "]# "+"</span><strong>" + encode(text.value)+"</strong>" + "\n";
+                                                        chat.innerHTML += line;
+                                                        text.value = "";
+                                                      }
+                                                    };
+                                              
+                                                  </script>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

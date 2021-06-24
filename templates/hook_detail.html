@@ -1,0 +1,161 @@
+<html ng-app="app" ng-controller="AppController" class="ng-scope">
+    {{template "header"}}
+    <body>
+        <!-- uiView: -->
+        <div class="mainView ng-scope" ui-view="">
+            <!-- ngIf: token.uuid -->
+            <div class="container-fluid ng-scope" id="app" ng-if="token.uuid">
+                <div class="row">
+                    <div id="request" class="col-12">
+
+                        <div>
+                            <div class="container-fluid">
+                                <div class="row" id="requestDetails" ng-show="!hideDetails" ng-class="{'muted': !hasRequests}">
+                                    <div class="col-md-6">
+                                        <table class="table table-borderless table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="2">
+                                                        Request Details
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <!-- ngIf: currentRequest.type === 'web' -->
+                                                <tr ng-if="currentRequest.type === 'web'" class="ng-scope">
+                                                    <td>
+                                                        <span class="label label-info">{{.Req.Method}}</span>
+                                                    </td>
+                                                    <td id="req-url" class="break">
+                                                        <a href="{{.Req.Url}}" class="ng-binding">{{.Req.Url}}</a>
+                                                    </td>
+                                                </tr>
+                                                <!-- end ngIf: currentRequest.type === 'web' -->
+                                                <!-- ngIf: currentRequest.type === 'web' -->
+                                                <tr ng-if="currentRequest.type === 'web'" class="ng-scope">
+                                                    <td>Host</td>
+                                                    <td id="req-ip" class="ng-binding">
+                                                        {{.Req.ClientIp}}
+                                                        <a class="small" target="_blank" ng-show="hasRequests" href="https://who.is/whois-ip/ip-address/{{.Req.ClientIp}}">whois</a>
+                                                    </td>
+                                                </tr>
+                                                <!-- end ngIf: currentRequest.type === 'web' -->
+                                                <!-- ngIf: currentRequest.type === 'email' -->
+                                                <tr>
+                                                    <td>Date</td>
+                                                    <td id="req-date" title="{{.Req.Date}}">
+                                                        <span ng-show="hasRequests" class="ng-binding">{{.Req.Date}}</span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td width="15%" d="">ID</td>
+                                                    <td id="req-date" class="ng-binding">{{.Req.Id}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <!-- ngIf: currentRequest.type === 'email' -->
+                                        <!-- ngIf: currentRequest.files -->
+                                        <table class="table table-borderless table-striped ng-scope" ng-if="currentRequest.files">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="2">Query strings</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {{range $key, $value := .Query }}
+                                                <tr ng-repeat="(name, value) in currentRequest.query" class="ng-scope">
+                                                    <td width="25%" class="break ng-binding">{{$key}}</td>
+                                                    <td class="break"><code class="ng-binding">{{$value}}</code></td>
+                                                </tr>
+                                                {{end}}
+                                            </tbody>
+                                        </table>
+                                        <!-- end ngIf: currentRequest.files -->
+                                    </div>
+                                    <div class="col-md-6">
+                                        <table class="table table-borderless table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="2">Headers</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {{range $key, $value := .Req.Header}}
+                                                <!-- ngRepeat: (headerName, values) in currentRequest.headers track by headerName -->
+                                                <tr ng-repeat="(headerName, values) in currentRequest.headers track by headerName" class="ng-scope">
+                                                    <td width="25%" class="ng-binding">{{ $key }}</td>
+                                                    <td class="long">
+                                                        <code class="ng-binding">
+                                                            {{$value}}
+                                                        </code>
+                                                    </td>
+                                                </tr>
+                                                <!-- end ngRepeat: (headerName, values) in currentRequest.headers track by headerName -->
+                                                {{end}}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="row" ng-class="{'muted': !hasRequests}">
+                                    <div class="col-md-12">
+                                        <!-- No content -->
+                                        <p id="noContent" ng-show="!hasRequests || currentRequest.content == ''" class="ng-hide">
+                                            No content
+                                        </p>
+
+                                        <!-- Text content (Email only) -->
+                                        <p class="pull-right small ng-hide" ng-show="currentRequest.type === 'email' &amp;&amp; currentRequest.text_content">
+                                            <label class="inline" title="Toggles word-wrap">
+                                                <input type="checkbox" ng-model="wordWrapEnable" ga-on="click" ga-event-category="WordWrap" ga-event-action="toggle" class="ng-pristine ng-untouched ng-valid ng-not-empty" />
+                                                Word-Wrap
+                                            </label>
+                                            &emsp;<a ng-click="copy(currentRequest.text_content)">Copy</a>
+                                        </p>
+                                        <p class="header strong ng-hide" ng-show="currentRequest.type === 'email' &amp;&amp; currentRequest.text_content">
+                                            Text Content
+                                        </p>
+                                        <pre
+                                            class="req-content ng-binding ng-hide wordwrapDisable"
+                                            ng-show="currentRequest.type === 'email' &amp;&amp; currentRequest.text_content"
+                                            ng-class="{'wordwrapDisable': wordWrapEnable}"
+                                            ng-bind="currentRequest.text_content"
+                                        ></pre>
+
+                                        <!-- Content (Email+Web) -->
+                                        <div ng-show="hasRequests &amp;&amp; (currentRequest.content != '' || currentRequest.email_truncated)" class="">
+                                            <p class="header strong">Raw Content</p>
+                                            <!-- ngIf: currentRequest.email_truncated -->
+                                            <div class="req-content-container">
+                                                <!-- ngIf: !currentRequest.email_truncated -->
+                                                <pre
+                                                    class="req-content ng-binding ng-scope wordwrapDisable"
+                                                    ng-if="!currentRequest.email_truncated"
+                                                    ng-class="{'wordwrapDisable': wordWrapEnable}"
+                                                    ng-bind="formatJsonEnable ? formatContentJson(currentRequest.content) : currentRequest.content"
+                                                >
+{{.Req.Body}}
+                                                </pre>
+                                                <!-- end ngIf: !currentRequest.email_truncated -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ngIf: hasActionOutput() -->
+
+                                <!-- ngRepeat: (id, outputs) in currentRequest.custom_action_output -->
+
+                                <!-- ngIf: redirectResponses[currentRequest.uuid].data.length > 0 -->
+
+                                <!-- ngRepeat: (id, response) in redirectResponses[currentRequest.uuid].data -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end ngIf: token.uuid -->
+
+        </div>
+
+    </body>
+</html>

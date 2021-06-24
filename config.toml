@@ -1,0 +1,11 @@
+Listen = "127.0.0.1:5000"
+
+User   = "admin"
+Pass   = "admin"
+
+MongoDatabase       = "reqhook"
+MongoServer         = ["192.168.56.101:27017"]
+MongoReplicaSetName = ""
+MongoUser           = ""
+MongoPassword       = ""
+MongoAuthDB         = ""
