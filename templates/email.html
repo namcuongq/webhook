@@ -1,0 +1,102 @@
+<html ng-app="app" ng-controller="AppController" class="ng-scope">
+    {{template "header"}}
+    <body style="padding-top: 50px;">
+        <!-- uiView: -->
+        <div class="mainView ng-scope" ui-view="">
+            {{template "menu"}}
+            <!-- ngIf: token.uuid -->
+            <div class="container-fluid ng-scope" id="app" ng-if="token.uuid">
+                <div class="row">
+                    <div class="col-sm-3 col-md-2 sidebar sidebar-top" style="top: 50px;">
+                        <div class="sidebar-header">
+                            <button type="button" id="sorting-toggle" class="btn btn-default btn-xxs dropdown-toggle ng-binding" ng-click="toggleSorting()" title="Toggle ordering">Emails</button>
+                        </div>
+
+                        <div>
+                            Fake mailer with from, to, encryption,...
+                            <ul class="nav nav-sidebar">
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-md-2 sidebar" style="margin-top: 10px; height: 40px; bottom: 0px; top: auto; padding: 10px 0 0 0;">
+                        <div class="text-center" ng-show="hasRequests"></div>
+                    </div>
+                    <div id="request" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                        <div>
+                            <div class="container-fluid">
+                                {{if .Success }}
+                                <script>alert("Send success!")</script>
+                                {{end}}
+                                <div class="row" id="requestDetails" ng-show="!hideDetails" ng-class="{'muted': !hasRequests}">
+                                    <form class="form-horizontal ng-pristine ng-valid ng-valid-min ng-valid-max" method="POST" action="/admin/email">
+                                        {{if .Err }}
+                                        <div class="alert alert-danger" role="alert" style="width: 100%;">
+                                            {{.Err}}
+                                          </div>
+                                        {{end}}
+                                        <fieldset>
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label" for="edit_token_default_status">From</label>
+                                                <div class="col-md-4">
+                                                    <input
+                                                    value="{{.Message.From}}"
+                                                        name="from"
+                                                        type="text"
+                                                        class="form-control input-md ng-pristine ng-valid ng-not-empty ng-touched"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label" for="edit_token_default_content_type">To</label>
+                                                <div class="col-md-4">
+                                                    <input
+                                                    value="{{.Message.To}}"
+                                                        name="to"
+                                                        type="text"
+                                                        class="form-control input-md ng-pristine ng-untouched ng-valid ng-not-empty"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label" for="edit_token_timeout">Subject</label>
+                                                <div class="col-md-4">
+                                                    <input
+                                                    value="{{.Message.Subject}}"
+                                                        name="subject"
+                                                        type="text"
+                                                        class="form-control input-md ng-pristine ng-untouched ng-valid ng-not-empty ng-valid-min ng-valid-max"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label" for="edit_token_default_content">Body </label>
+                                                <div class="col-md-7">
+                                                    <textarea
+                                                        class="form-control monospace ng-pristine ng-untouched ng-valid ng-empty"
+                                                        name="body"
+                                                        rows="5"
+                                                    >{{.Message.Body}}</textarea>
+                                                    <!-- ngInclude: 'subviews/components/requestVariablesDropup.html' -->
+                                                    <div style="margin-top: 5px;" class="ng-scope">
+                                                        <div class="">
+                                                            <button type="submit" class="btn btn-default">
+                                                                Send
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end ngIf: token.uuid -->
+        </div>
+
+        <script></script>
+    </body>
+</html>

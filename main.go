@@ -13,6 +13,7 @@ import (
 	"time"
 	"webhook/constant"
 	"webhook/container"
+	"webhook/email"
 	"webhook/model"
 	"webhook/socket"
 
@@ -108,6 +109,8 @@ func route() {
 	authorized.GET("/hook/view", getAllHookRequest)
 	authorized.GET("/hook/view/:id", getHookRequest)
 	authorized.GET("/hook/del/:id", delHookRequest)
+	authorized.GET("/email", getEmailPage)
+	authorized.POST("/email", sendEmail)
 	authorized.GET("/xss/channel/:name/ws", func(c *gin.Context) {
 		m.HandleRequest(c.Writer, c.Request)
 	})
@@ -131,6 +134,65 @@ func route() {
 	})
 
 	r.Run(container.Get().Config.Listen)
+}
+
+func sendEmail(c *gin.Context) {
+	from := c.PostForm("from")
+	to := c.PostForm("to")
+	subject := c.PostForm("subject")
+	body := c.PostForm("body")
+
+	msg := email.Message{
+		To:      to,
+		From:    from,
+		Subject: subject,
+		Body:    body,
+	}
+
+	var err error
+	if len(msg.From) < 1 {
+		err = fmt.Errorf("From is not null")
+	}
+
+	if len(msg.To) < 1 {
+		err = fmt.Errorf("To is not null")
+	}
+
+	if len(msg.Subject) < 1 {
+		err = fmt.Errorf("Subject is not null")
+	}
+
+	if len(msg.Body) < 1 {
+		err = fmt.Errorf("Body is not null")
+	}
+
+	if err != nil {
+		c.HTML(http.StatusOK, "email.html", gin.H{
+			"Message": msg,
+			"Err":     err.Error(),
+		})
+		return
+	}
+
+	err = msg.Send()
+	if err != nil {
+		c.HTML(http.StatusOK, "email.html", gin.H{
+			"Message": msg,
+			"Err":     err.Error(),
+		})
+		return
+	}
+
+	c.HTML(http.StatusOK, "email.html", gin.H{
+		"Success": true,
+	})
+}
+
+func getEmailPage(c *gin.Context) {
+	var msg = email.Message{}
+	c.HTML(http.StatusOK, "email.html", gin.H{
+		"Message": msg,
+	})
 }
 
 func delHookRequest(c *gin.Context) {
@@ -170,7 +232,7 @@ func getHookRequest(c *gin.Context) {
 
 func getAllHookRequest(c *gin.Context) {
 	var reqs []model.Req
-	err := container.Get().DB.C(constant.TABLE_REQUEST).Find(nil).Sort("-date").All(&reqs)
+	err := container.Get().DB.C(constant.TABLE_REQUEST).Find(nil).Sort("-_id").All(&reqs)
 	if err != nil {
 		panic(err)
 	}
