@@ -63,3 +63,4 @@ Truy cập link sau để gửi
 ```
 http://<ip>/admin/email
 ```
+![demo](https://github.com/namcuongq/webhook/blob/main/example/email.png)
