@@ -6,6 +6,7 @@ webhook là công cụ hỗ trợ pentest. Các chức năng chỉ mang tính ch
 
 * [x] Hứng reuqest HTTP, lưu trữ và hiển thị full request
 * [x] XSS RCE
+* [x] Fake Email
 * [ ] Điều kiển máy tình từ xa.
 
 ## Cài đặt
@@ -35,7 +36,7 @@ go run main.go
 
 ## Tính năng
 ### Request Hook
-Mục đích: để kiểm tra các lỗi như xss, rce bằng cách nhận request http từ phía máy victim để check.
+Mục đích: để kiểm tra các lỗi như xss, ssrf, rce, ... bằng cách nhận request http từ phía máy victim để check.
 ####
 Trên victim tạo request truy cập link sau
 ```
@@ -55,3 +56,10 @@ Trên server truy cập link sau để bắt đầu:
 http://<ip>/admin/xss/channels
 ```
 ![demo](https://github.com/namcuongq/webhook/blob/main/example/xss.png)
+
+### EMail Fake
+Mục đích: Kiểm tra gửi email giả mạo với tên miền của victim
+Truy cập link sau để gửi
+```
+http://<ip>/admin/email
+```
